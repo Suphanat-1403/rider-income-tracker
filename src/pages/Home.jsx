@@ -50,8 +50,13 @@ export default function Home() {
       .lte('record_date', endDate)
       .order('record_date', { ascending: false })
 
-    if (!error) setRecords(data || [])
-    setLoading(false)
+    if (error) {
+    console.error('❌ Supabase Error:', error)  // เพิ่มบรรทัดนี้
+    alert('Error: ' + error.message)           // แจ้งเตือนเห็นชัดๆ
+  } else {
+    setRecords(data || [])
+  }
+  setLoading(false)
   }
 
   // เพิ่มรายการใหม่
