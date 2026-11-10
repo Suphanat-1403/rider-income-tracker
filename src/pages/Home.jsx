@@ -39,25 +39,32 @@ export default function Home() {
 
   // ดึงรายการตามเดือนปัจจุบัน
   const fetchRecords = async () => {
-    setLoading(true)
-    const startDate = `${currentMonthKey}-01`
-    const endDate = `${currentMonthKey}-31`
+  setLoading(true)
+  const startDate = `${currentMonthKey}-01`
+  
+  // คำนวณวันสิ้นเดือนให้ถูกต้อง แก้ปัญหาเดือน 31 วัน
+  const lastDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate()
+  const endDate = `${currentMonthKey}-${String(lastDay).padStart(2, '0')}`
 
-    const { data, error } = await supabase
-      .from('records')
-      .select('*')
-      .gte('record_date', startDate)
-      .lte('record_date', endDate)
-      .order('record_date', { ascending: false })
+  const { data, error } = await supabase
+    .from('records')
+    .select('*')
+    .gte('record_date', startDate)
+    .lte('record_date', endDate)
+    .order('record_date', { ascending: false })
 
-    if (error) {
-    console.error('❌ Supabase Error:', error)  // เพิ่มบรรทัดนี้
-    alert('Error: ' + error.message)           // แจ้งเตือนเห็นชัดๆ
+  if (error) {
+    // แสดงรายละเอียด Error ครบถ้วน
+    console.error('❌ Error Code:', error.code)
+    console.error('❌ Error Message:', error.message)
+    console.error('❌ Error Details:', error.details)
+    console.error('❌ Error Hint:', error.hint)
+    alert(`ผิดพลาด: ${error.code} - ${error.message}`)
   } else {
     setRecords(data || [])
   }
   setLoading(false)
-  }
+}
 
   // เพิ่มรายการใหม่
   const addRecord = async (newRecord) => {
